@@ -84,6 +84,9 @@ namespace Complete
             // Play the tank explosion sound effect
             m_ExplosionAudio.Play();
 
+            // The camera following this tank will follow another tank
+            GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().ChangeDeadCamera(GetComponent<TankMovement>().m_PlayerNumber);
+
             // Turn the tank off
             gameObject.SetActive (false);
         }

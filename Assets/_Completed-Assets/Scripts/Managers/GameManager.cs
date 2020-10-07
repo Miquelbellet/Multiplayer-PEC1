@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using Cinemachine;
+using System.Collections.Generic;
 
 namespace Complete
 {
@@ -30,6 +31,7 @@ namespace Complete
         private TankManager m_GameWinner;           // Reference to the winner of the game.  Used to make an announcement of who won
         private int m_NumPlayers = 2;               // Default number of tanks
         private TankManager[] m_TanksStore;
+        List<int> m_deadTanks = new List<int>();
 
         private void Start()
         {
@@ -485,6 +487,8 @@ namespace Complete
         {
             for (int i = 0; i < m_Tanks.Length; i++)
             {
+                m_PlayersFollowCams[i].Follow = m_Tanks[i].m_Instance.transform;
+                m_PlayersFollowCams[i].LookAt = m_Tanks[i].m_Instance.transform;
                 m_Tanks[i].Reset();
             }
         }
@@ -552,6 +556,26 @@ namespace Complete
             m_PanelNumPlayersUI.SetActive(false);
             SetActiveTanks();
             StartGame();
+        }
+
+        public void ChangeDeadCamera(int deadPlayerNum)
+        {
+            m_deadTanks.Add(deadPlayerNum);
+            foreach (TankManager tank in m_Tanks)
+            {
+                if (m_deadTanks.Count+1 < m_NumPlayers && !m_deadTanks.Contains(tank.m_PlayerNumber))
+                {
+                    m_PlayersFollowCams[deadPlayerNum - 1].Follow = m_Tanks[tank.m_PlayerNumber-1].m_Instance.transform;
+                    m_PlayersFollowCams[deadPlayerNum - 1].LookAt = m_Tanks[tank.m_PlayerNumber-1].m_Instance.transform;
+                    foreach (int dead in m_deadTanks)
+                    {
+                        m_PlayersFollowCams[dead - 1].Follow = m_Tanks[tank.m_PlayerNumber - 1].m_Instance.transform;
+                        m_PlayersFollowCams[dead - 1].LookAt = m_Tanks[tank.m_PlayerNumber - 1].m_Instance.transform;
+                    }
+                    return;
+                }
+            }
+            
         }
     }
 }
